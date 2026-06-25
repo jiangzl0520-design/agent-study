@@ -7,6 +7,7 @@ from tools.calculator import safe_calculator
 from tools.time_tool import get_current_time
 from tools.memory_tool import save_memory, search_memory
 from tools.progress_tool import save_progress, search_progress
+from tools.task_tool import add_task, update_task_status, search_tasks
 from utils.json_parser import extract_json
 from tools.planner_tool import build_plan_prompt
 
@@ -80,7 +81,30 @@ class PersonalAgent:
   "query": "用户想查询的学习进度"
 }
 
-8. chat
+8. add_task
+用途：当用户要求添加任务、新建任务、记录待办事项时使用。
+参数：
+{
+  "title": "任务名称",
+  "status": "未开始"
+}
+
+9. update_task_status
+用途：当用户要求把某个任务改成未开始、进行中、已完成时使用。
+参数：
+{
+  "title": "任务名称",
+  "status": "进行中"
+}
+
+10. search_tasks
+用途：当用户询问当前任务、任务列表、已完成任务、进行中任务、待办任务时使用。
+参数：
+{
+  "query": "用户想查询的任务"
+}
+
+11. chat
 用途：普通聊天、解释概念、学习建议、不需要调用工具的问题。
 参数：
 {
@@ -89,7 +113,7 @@ class PersonalAgent:
 
 你必须只返回 JSON，不要返回 Markdown，不要解释。
 
-返回格式只能是以下八种之一：
+返回格式只能是以下十一种之一：
 
 {
   "tool": "calculator",
@@ -132,6 +156,26 @@ class PersonalAgent:
   "tool": "search_progress",
   "args": {
     "query": "用户最近完成了什么"
+  }
+}
+{
+  "tool": "add_task",
+  "args": {
+    "title": "学习 RAG",
+    "status": "未开始"
+  }
+}
+{
+  "tool": "update_task_status",
+  "args": {
+    "title": "学习 RAG",
+    "status": "进行中"
+  }
+}
+{
+  "tool": "search_tasks",
+  "args": {
+    "query": "用户想查询的任务"
   }
 }
 {
@@ -283,6 +327,23 @@ class PersonalAgent:
             query = args.get("query", user_input)
             result = search_progress(query)
             answer = self.summarize_tool_result(user_input, "search_progress", result)
+            return decision, answer
+        if tool_name == "add_task":
+            title = args.get("title", user_input)
+            status = args.get("status", "未开始")
+            result = add_task(title, status)
+            answer = self.summarize_tool_result(user_input, "add_task", result)
+            return decision, answer
+        if tool_name == "update_task_status":
+            title = args.get("title", user_input)
+            status = args.get("status", "进行中")
+            result = update_task_status(title, status)
+            answer = self.summarize_tool_result(user_input, "update_task_status", result)
+            return decision, answer
+        if tool_name == "search_tasks":
+            query = args.get("query", user_input)
+            result = search_tasks(query)
+            answer = self.summarize_tool_result(user_input, "search_tasks", result)
             return decision, answer
         if tool_name == "make_plan":
             goal = args.get("goal", user_input)
