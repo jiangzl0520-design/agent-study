@@ -921,3 +921,23 @@ V7 的核心原理是：
 Python 工具负责读写 tasks.json，大模型负责理解意图和整理回答。
 
 V7 让我理解了 Agent 不只是记录学习日志，还可以管理任务状态。
+## V8：Streamlit 网页界面
+
+V8 在前面命令行 Agent 的基础上，新增了一个 Streamlit 网页界面。
+
+在 V8 之前，Agent 只能通过终端运行，用户需要在命令行输入问题。V8 新增了 `app.py`，让用户可以在浏览器中和 Agent 对话。
+
+V8 主要新增内容：
+
+- 新建 `app.py`
+- 在 `requirements.txt` 中新增 `streamlit`
+- 使用 `st.chat_input()` 接收用户输入
+- 使用 `st.chat_message()` 展示用户和 Agent 的对话
+- 使用 `st.session_state` 保存网页会话状态
+- 复用原有 `PersonalAgent`，不重写 Agent 核心逻辑
+
+V8 的核心原理是：
+
+用户在网页输入问题后，Streamlit 页面把输入传给 `PersonalAgent.run_once()`，Agent 继续按照原来的工具调用流程处理问题，然后把回答返回到网页显示。
+
+V8 让我理解了如何把一个命令行 AI Agent 包装成可以在浏览器中使用的简单 Web 应用。
