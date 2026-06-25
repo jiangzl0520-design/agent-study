@@ -941,3 +941,33 @@ V8 的核心原理是：
 用户在网页输入问题后，Streamlit 页面把输入传给 `PersonalAgent.run_once()`，Agent 继续按照原来的工具调用流程处理问题，然后把回答返回到网页显示。
 
 V8 让我理解了如何把一个命令行 AI Agent 包装成可以在浏览器中使用的简单 Web 应用。
+## V9：本地知识库问答 Agent
+
+V9 在 V8 网页版 Agent 的基础上，新增了本地知识库问答能力。
+
+本版本没有使用向量数据库，也没有使用 embedding，而是先实现一个简单版 RAG 流程：
+
+用户提问
+↓
+Agent 判断需要查询知识库
+↓
+调用 search_knowledge 工具
+↓
+读取 knowledge/knowledge.txt
+↓
+按段落搜索相关内容
+↓
+把检索结果交给大模型总结回答
+
+V9 新增文件：
+
+- knowledge/knowledge.txt：本地知识库内容
+- tools/knowledge_tool.py：知识库读取与搜索工具
+
+V9 修改文件：
+
+- agents/personal_agent.py：接入 search_knowledge 工具
+
+V9 的核心原理是 RAG，也就是 Retrieval-Augmented Generation，检索增强生成。它不是直接让大模型凭空回答，而是先从本地知识库中找出相关内容，再让大模型基于这些内容回答。
+
+这个版本让我理解了 RAG 的基础流程：文档读取、文本切分、内容检索、基于上下文回答。
