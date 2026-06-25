@@ -903,3 +903,21 @@ main.py 负责启动
 这个项目的核心价值是：
 
 > 我通过从 V1 到 V6 的逐步开发，完整理解了一个 AI Agent 从规则判断、大模型聊天、工具调用、长期记忆、任务规划到进度追踪的演进过程。
+## V7：任务状态管理 Agent
+V7 在 V6 的学习进度记录基础上，新增了任务状态管理能力。
+
+新增工具：
+- add_task：添加任务
+- update_task_status：更新任务状态
+- search_tasks：查询任务
+
+任务数据保存在 tasks.json 中，格式包括 title、status、created_at、updated_at。
+
+V7 的核心原理是：
+用户输入任务相关请求后，decide_tool() 让大模型判断应该调用哪个任务工具。
+如果用户要求添加任务，就调用 add_task。
+如果用户要求修改状态，就调用 update_task_status。
+如果用户查询任务列表，就调用 search_tasks。
+Python 工具负责读写 tasks.json，大模型负责理解意图和整理回答。
+
+V7 让我理解了 Agent 不只是记录学习日志，还可以管理任务状态。
