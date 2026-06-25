@@ -1,0 +1,25 @@
+什么是 AI Agent
+AI Agent 是一个能够接收用户输入、判断任务、选择行动并返回结果的程序。在本项目中，Agent 的基本流程是：用户输入 -> Agent 判断 -> 调用工具或大模型 -> 返回回答。
+
+什么是 Tool Calling
+Tool Calling 是让大模型根据用户问题选择合适工具的能力。大模型负责理解问题和生成工具调用 JSON，Python 函数负责真正执行计算、查时间、保存记忆、查询任务等操作。
+
+什么是 Memory
+Memory 是 Agent 的记忆能力。本项目中有短期记忆和长期记忆。短期记忆保存在程序运行期间的对话列表中，长期记忆保存在本地 memory.json 文件中。
+
+什么是 Planning
+Planning 是任务规划能力。Agent 可以根据用户目标生成阶段拆解、具体任务和今天可以执行的事项。本项目通过 planner_tool.py 构建规划 Prompt，再让大模型生成计划。
+
+什么是 RAG
+RAG 是 Retrieval-Augmented Generation，意思是检索增强生成。它的基本思想是先从外部资料或知识库中检索相关内容，再让大模型结合这些内容回答问题。本项目 V9 使用简单文本关键词匹配，不使用向量数据库和 embedding。
+
+项目 V1 到 V8 简介
+V1 是规则 Agent，使用 if/elif 判断用户输入。
+V2 接入大模型，实现 AI Chat Agent。
+V2.5 增加短期记忆，把对话历史保存在 messages 列表中。
+V3 增加工具调用能力，例如 calculator 和 get_time。
+V4 增加长期记忆，使用 memory.json 保存用户信息。
+V5 增加任务规划能力，可以生成学习计划和项目计划。
+V6 增加学习进度记录能力，使用 progress.json 保存学习记录。
+V7 增加任务状态管理能力，支持添加任务、更新任务状态和查询任务。
+V8 增加 Streamlit 网页界面，让用户可以在浏览器中和 Agent 对话。

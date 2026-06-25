@@ -8,6 +8,7 @@ from tools.time_tool import get_current_time
 from tools.memory_tool import save_memory, search_memory
 from tools.progress_tool import save_progress, search_progress
 from tools.task_tool import add_task, update_task_status, search_tasks
+from tools.knowledge_tool import search_knowledge
 from utils.json_parser import extract_json
 from tools.planner_tool import build_plan_prompt
 
@@ -104,7 +105,14 @@ class PersonalAgent:
   "query": "用户想查询的任务"
 }
 
-11. chat
+11. search_knowledge
+用途：当用户要求根据知识库、本地文档、项目资料、学习笔记回答问题时使用。
+参数：
+{
+  "query": "用户想从知识库中查询的问题"
+}
+
+12. chat
 用途：普通聊天、解释概念、学习建议、不需要调用工具的问题。
 参数：
 {
@@ -113,7 +121,7 @@ class PersonalAgent:
 
 你必须只返回 JSON，不要返回 Markdown，不要解释。
 
-返回格式只能是以下十一种之一：
+返回格式只能是以下十二种之一：
 
 {
   "tool": "calculator",
@@ -176,6 +184,12 @@ class PersonalAgent:
   "tool": "search_tasks",
   "args": {
     "query": "用户想查询的任务"
+  }
+}
+{
+  "tool": "search_knowledge",
+  "args": {
+    "query": "用户想从知识库中查询的问题"
   }
 }
 {
@@ -344,6 +358,11 @@ class PersonalAgent:
             query = args.get("query", user_input)
             result = search_tasks(query)
             answer = self.summarize_tool_result(user_input, "search_tasks", result)
+            return decision, answer
+        if tool_name == "search_knowledge":
+            query = args.get("query", user_input)
+            result = search_knowledge(query)
+            answer = self.summarize_tool_result(user_input, "search_knowledge", result)
             return decision, answer
         if tool_name == "make_plan":
             goal = args.get("goal", user_input)
