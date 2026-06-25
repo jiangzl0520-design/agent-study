@@ -7,7 +7,7 @@ from tools.calculator import safe_calculator
 from tools.time_tool import get_current_time
 from tools.memory_tool import save_memory, search_memory
 from utils.json_parser import extract_json
-
+from tools.planner_tool import build_plan_prompt
 
 class PersonalAgent:
     """
@@ -58,8 +58,13 @@ class PersonalAgent:
 {
   "query": "用户想查询的记忆"
 }
-
-5. chat
+5. make_plan
+用途：当用户要求制定计划、学习路线、项目路线、任务拆解、实习准备计划时使用。
+参数：
+{
+  "goal": "用户想要实现的目标"
+}
+6. chat
 用途：普通聊天、解释概念、学习建议、不需要调用工具的问题。
 参数：
 {
@@ -68,7 +73,7 @@ class PersonalAgent:
 
 你必须只返回 JSON，不要返回 Markdown，不要解释。
 
-返回格式只能是以下五种之一：
+返回格式只能是以下六种之一：
 
 {
   "tool": "calculator",
@@ -95,7 +100,12 @@ class PersonalAgent:
     "query": "用户叫什么"
   }
 }
-
+{
+  "tool": "make_plan",
+  "args": {
+    "goal": "用户想要实现的目标"
+  }
+}
 {
   "tool": "chat",
   "args": {
@@ -184,7 +194,27 @@ class PersonalAgent:
         )
 
         return response.choices[0].message.content
+    def make_plan(self, user_goal):
+        """
+        根据用户目标生成任务规划。
+        """
+        plan_prompt = build_plan_prompt(user_goal)
 
+        response = self.client.chat.completions.create(
+            model="deepseek-chat",
+            messages=[
+                {
+                    "role": "system",
+                    "content": "你是一个擅长制定学习计划、项目计划和任务拆解的 AI Agent。"
+                },
+                {
+                    "role": "user",
+                    "content": plan_prompt
+                }
+            ]
+        )
+
+        return response.choices[0].message.content
     def run_once(self, user_input):
         """
         处理用户的一次输入。
@@ -216,7 +246,10 @@ class PersonalAgent:
             result = search_memory(query)
             answer = self.summarize_tool_result(user_input, "search_memory", result)
             return decision, answer
-
+        if tool_name == "make_plan":
+            goal = args.get("goal", user_input)
+            answer = self.make_plan(goal)
+            return decision, answer
         if tool_name == "chat":
             message = args.get("message", user_input)
             answer = self.normal_chat(message)
