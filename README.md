@@ -531,3 +531,9 @@ main.py 负责启动程序
 ```powershell
 python main.py
 ```
+## 运行方式
+
+### 1. 命令行运行
+
+```bash
+python main.py
