@@ -6,6 +6,7 @@ from openai import OpenAI
 from tools.calculator import safe_calculator
 from tools.time_tool import get_current_time
 from tools.memory_tool import save_memory, search_memory
+from tools.progress_tool import save_progress, search_progress
 from utils.json_parser import extract_json
 from tools.planner_tool import build_plan_prompt
 
@@ -64,7 +65,22 @@ class PersonalAgent:
 {
   "goal": "用户想要实现的目标"
 }
-6. chat
+
+6. save_progress
+用途：当用户说“记录今天学了什么”“保存学习进度”“我完成了什么任务”时使用。
+参数：
+{
+  "content": "要保存的学习进度"
+}
+
+7. search_progress
+用途：当用户问“我最近完成了什么”“我学了什么”“我的学习进度是什么”时使用。
+参数：
+{
+  "query": "用户想查询的学习进度"
+}
+
+8. chat
 用途：普通聊天、解释概念、学习建议、不需要调用工具的问题。
 参数：
 {
@@ -73,7 +89,7 @@ class PersonalAgent:
 
 你必须只返回 JSON，不要返回 Markdown，不要解释。
 
-返回格式只能是以下六种之一：
+返回格式只能是以下八种之一：
 
 {
   "tool": "calculator",
@@ -104,6 +120,18 @@ class PersonalAgent:
   "tool": "make_plan",
   "args": {
     "goal": "用户想要实现的目标"
+  }
+}
+{
+  "tool": "save_progress",
+  "args": {
+    "content": "用户今天完成了 Agent V5 任务规划功能"
+  }
+}
+{
+  "tool": "search_progress",
+  "args": {
+    "query": "用户最近完成了什么"
   }
 }
 {
@@ -245,6 +273,16 @@ class PersonalAgent:
             query = args.get("query", user_input)
             result = search_memory(query)
             answer = self.summarize_tool_result(user_input, "search_memory", result)
+            return decision, answer
+        if tool_name == "save_progress":
+            content = args.get("content", user_input)
+            result = save_progress(content)
+            answer = self.summarize_tool_result(user_input, "save_progress", result)
+            return decision, answer
+        if tool_name == "search_progress":
+            query = args.get("query", user_input)
+            result = search_progress(query)
+            answer = self.summarize_tool_result(user_input, "search_progress", result)
             return decision, answer
         if tool_name == "make_plan":
             goal = args.get("goal", user_input)
